@@ -1,118 +1,197 @@
-RJDAP-FD v1 - Reliable Job Dispatch & Aggregation Protocol over UDP
-Computer Networks Major Task, Fall 2026 - Project 2 (RJDAP), Phase 1 prototype
-Team: Hana Tamer Ismaeil      24P0336
-      Raghad Mohamed ElSherif 24P0044
-      Salma Mohamed ElSherif  24P0012
-      Mohamed Kareem Kamal    24P0047
+# RJDAP-FD v1
+## Reliable Job Dispatch & Aggregation Protocol over UDP
 
+**Computer Networks Major Task — Fall 2026**  
+**Project 2 (RJDAP) | Phase 1: Prototype**
 
-DEMO VIDEO:
+### Team Members
 
+| Name | Student ID |
+|---|---|
+| Hana Tamer Ismaeil | 24P0336 |
+| Raghad Mohamed ElSherif | 24P0044 |
+| Salma Mohamed ElSherif | 24P0012 |
+| Mohamed Kareem Kamal | 24P0047 |
 
+### Demo Video
 
-1. WHAT THIS IS
----------------
-A Command Hub (server) sends small hash-search tasks to Worker clients over UDP.
-Each Worker computes the task and returns the result. The protocol detects lost
-and repeated packets so that every result is counted exactly once.
+**Duration:** 5 minutes  
+**Access:** Anyone with the link can view  
+**Video link:** [Paste the video link here]
 
-Phase 1 demonstrates the INIT exchange (WORKER_JOIN, JOIN_ACK) and the DATA
-exchange (TASK_DISPATCH, TASK_RESULT, ACK_RESULT), with every packet logged.
+---
 
+## 1. Project Overview
 
-2. REQUIREMENTS
----------------
-- Python 3.8 or newer (developed with Python 3.13).
-- Standard library only. No pip install is needed.
+RJDAP-FD is a custom application-layer protocol built on UDP for reliable job dispatch and result aggregation.
 
+A central **Command Hub (server)** distributes small hash-search tasks to **Worker clients**. Each Worker processes its assigned task and returns the result to the Hub. The protocol uses acknowledgements, retransmissions, and duplicate-result suppression to improve reliability and ensure each result is accepted and counted only once.
 
-3. FOLDER LAYOUT
-----------------
-  protocol/   header.py (18-byte header, pack/unpack), messages.py (types, payloads),
-              checksum.py (CRC32), logger.py (packet log to CSV)
-  server/     server.py (Command Hub), task_queue.py, worker_registry.py
-  worker/     client.py (Worker), compute.py (hash search)
-  tests/      baseline.py (automated baseline scenario),
-              test_results.py (checks the logs), test_protocol.py (header self-test)
-  logs/       CSV logs written by each run
-  captures/   packet captures (.pcap)
-  docs/       proposal.pdf, mini_rfc.pdf
+The Phase 1 prototype demonstrates:
 
+- **Initialization (INIT):** `WORKER_JOIN` and `JOIN_ACK`
+- **Data exchange (DATA):** `TASK_DISPATCH`, `TASK_RESULT`, and `ACK_RESULT`
+- **Logging:** Packet events and accepted task results are recorded in CSV files.
 
-4. QUICK START: AUTOMATED BASELINE
-----------------------------------
-Open a terminal in the project root folder (the folder that contains this file)
-and run:
+## 2. Requirements
 
-    python -m tests.baseline
+- **Python:** 3.8 or newer (developed with Python 3.13).
+- **Dependencies:** Python standard library only; no additional packages are required.
 
-(On Linux/macOS use python3 if python is not Python 3.)
+## 3. Project Structure
 
-This starts the server and 4 workers on localhost, runs 1,000 tasks, then checks
-the logs. The last line should be:
+```text
+protocol/   Header encoding, message types, payloads, CRC32 checksums, and CSV logging
+server/     Command Hub, task queue, and Worker registry
+worker/     Worker client and hash-search computation
+tests/      Automated baseline and protocol/result tests
+logs/       CSV packet-event and task-result logs
+captures/   Packet captures (.pcap), when generated
+docs/       Project proposal and Mini-RFC
+```
 
-    PASS: all 1000 tasks completed correctly, zero duplicate executions
+## 4. Quick Start: Automated Baseline Test
 
-Exit code is 0 on PASS and 1 on FAIL. Options:
+Run the baseline test from the **project root directory** (the directory containing this README).
 
-    --workers 4      number of workers
-    --tasks 1000     number of tasks
-    --port 12000     UDP port of the server
+```bash
+python -m tests.baseline
+```
 
-Always run commands from the project root, otherwise the imports fail.
+On Linux or macOS, use `python3` if `python` does not point to Python 3.
 
+The automated baseline starts the server and four Workers on localhost, processes 1,000 tasks, and checks the results.
 
-5. RUNNING THE PARTS BY HAND
-----------------------------
-Use one terminal for the server and one terminal per worker.
+**Expected success message:**
 
-    python -m server.server --port 12000 --tasks 1000
-    python -m worker.client --server localhost --port 12000 --log logs/worker_1.csv
-    python -m worker.client --server localhost --port 12000 --log logs/worker_2.csv
-    (and so on for workers 3 and 4)
+```text
+PASS: all 1000 tasks completed correctly, zero duplicate executions
+```
 
-After the server prints its summary, check the logs:
+The script should exit with code `0` on success and `1` on failure.
 
-    python -m tests.test_results
+### Configurable options
 
-Check the header code on its own:
+The baseline supports the following options, if implemented by the script:
 
-    python -m tests.test_protocol
+| Option | Description | Default |
+|---|---|---:|
+| `--workers` | Number of Workers | `4` |
+| `--tasks` | Number of tasks | `1000` |
+| `--port` | UDP port used by the server | `12000` |
 
-Server options: --host, --port, --tasks, --range (numbers searched per task,
-default 2000), --seed (default 1), --log, --results, --idle-timeout.
-Worker options: --server, --port, --log, --timeout (ACK wait in seconds,
-default 0.2), --max-retries, --heartbeat (seconds, 0 = off), --idle-timeout.
+Run commands from the project root to ensure Python imports resolve correctly.
 
+## 5. Running the Server and Workers Manually
 
-6. LOG FILES (in logs/)
------------------------
-  server.csv, worker_N.csv   one line per packet sent or received:
-      timestamp,direction,msg_type,task_id,worker_id,attempt,payload_len,peer
-      (timestamp in Unix seconds, direction is SEND or RECV)
-  results.csv                one line per accepted result:
-      task_id,worker_id,attempt,found,value,correct
+For manual execution, start the server in one terminal and each Worker in a separate terminal. Run every command from the project root.
 
-The logs are overwritten at every run.
+**Terminal 1 — Command Hub**
 
+```bash
+python -m server.server --port 12000 --tasks 1000
+```
 
-7. PACKET CAPTURE
------------------
-Start the capture first, then run the baseline, then stop the capture.
+**Terminal 2 — Worker 1**
 
-  Linux / WSL2:
-      sudo tcpdump -i lo -w captures/baseline.pcap udp port 12000
-  Windows (Wireshark, Npcap installed):
-      capture on "Adapter for loopback traffic capture", filter: udp.port == 12000
-      then save as captures/baseline.pcap
+```bash
+python -m worker.client --server localhost --port 12000 --log logs/worker_1.csv
+```
 
-The protocol header is not decoded by Wireshark by default: the UDP payload
-starts with the bytes 52 4a (Magic "RJ"). The header layout is in docs/mini_rfc.pdf.
+**Terminal 3 — Worker 2**
 
+```bash
+python -m worker.client --server localhost --port 12000 --log logs/worker_2.csv
+```
 
-8. PHASE 1 LIMITS
------------------
-Not yet implemented (Phase 2): timeout-based task reassignment, Worker-crash
-detection from missed heartbeats, adaptive timeout, payload fragmentation and
-the netem experiments. In Phase 1 a Worker retransmits its result with a fixed
-200 ms timeout, and the server removes duplicate results using the Task_ID.
+Repeat the Worker command for Workers 3 and 4, using a different log filename for each Worker.
+
+After the run, execute the result and protocol tests:
+
+```bash
+python -m tests.test_results
+python -m tests.test_protocol
+```
+
+### Command-line options
+
+The server supports options including `--host`, `--port`, `--tasks`, `--range`, `--seed`, `--log`, `--results`, and `--idle-timeout`.
+
+The Worker supports options including `--server`, `--port`, `--log`, `--timeout`, `--max-retries`, `--heartbeat`, and `--idle-timeout`.
+
+Refer to the corresponding script's argument definitions for exact defaults and supported options.
+
+## 6. Logs and Results
+
+The `logs/` directory contains CSV files generated during execution. The logs are overwritten on each run.
+
+### Packet-event logs
+
+Files such as `server.csv` and `worker_N.csv` record packet events using this schema:
+
+```text
+timestamp,direction,msg_type,task_id,worker_id,attempt,payload_len,peer
+```
+
+| Field | Meaning |
+|---|---|
+| `timestamp` | Unix timestamp of the event |
+| `direction` | `SEND` or `RECV` |
+| `msg_type` | Protocol message type |
+| `task_id` | Associated task identifier |
+| `worker_id` | Associated Worker identifier |
+| `attempt` | Task attempt number |
+| `payload_len` | Payload length in bytes |
+| `peer` | Remote IP address and port |
+
+### Task-result log
+
+`results.csv` records accepted task results:
+
+```text
+task_id,worker_id,attempt,found,value,correct
+```
+
+These records allow the baseline test to verify task completion and result correctness.
+
+## 7. Packet Capture (Wireshark / tcpdump)
+
+Packet captures can be used to inspect UDP exchanges independently of the application's CSV logs. This section is included to prepare for the network experiments required in later project phases.
+
+### Linux / WSL2
+
+Start the capture before running the baseline:
+
+```bash
+sudo tcpdump -i lo -w captures/baseline.pcap udp port 12000
+```
+
+Stop the capture after the test finishes.
+
+### Windows
+
+1. Open Wireshark with Npcap installed.
+2. Select the loopback capture adapter.
+3. Apply the capture filter `udp port 12000`.
+4. Start capturing, run the baseline, then stop the capture.
+5. Save the capture as `captures/baseline.pcap`.
+
+Wireshark does not automatically decode the custom RJDAP-FD header. The UDP payload begins with the magic bytes `52 4a` (ASCII `RJ`). Refer to the Mini-RFC in `docs/` for the header layout.
+
+## 8. Phase 1 Scope and Limitations
+
+The Phase 1 prototype focuses on initialization, task dispatch, result delivery, acknowledgements, duplicate-result suppression, and logging.
+
+The following features are deferred to Phase 2:
+
+- Timeout-based task reassignment
+- Worker-crash detection based on missed heartbeats
+- Adaptive timeout mechanisms
+- Payload fragmentation
+- Network impairment experiments using `netem`
+
+In Phase 1, a Worker retransmits its result after a fixed 200 ms acknowledgement timeout, and the server suppresses duplicate results using the task identifier.
+
+---
+
+**End of README — RJDAP-FD v1, Phase 1 Prototype**
