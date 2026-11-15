@@ -1,11 +1,8 @@
-"""
-Baseline (LAN, no impairment) scenario. Run from the repo root:
 
-    python -m tests.baseline [--workers 4] [--tasks 1000] [--port 12000]
 
-Starts the server and the workers, waits until all tasks are done, then runs the
-result check (tests/test_results.py). Exit code 0 = pass, 1 = fail.
-"""
+#Starts the server and the workers, waits until all tasks are done, then runs the
+#result check (tests/test_results.py). Exit code 0 = pass, 1 = fail.
+
 import argparse
 import glob
 import os
