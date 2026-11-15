@@ -4,7 +4,6 @@ import glob
 import os
 from collections import Counter
 
-
 def read_csv(path):
     with open(path, newline='') as f:
         return list(csv.DictReader(f))
@@ -82,7 +81,6 @@ def main():
             print('  - ' + p)
         raise SystemExit(1)
     print('PASS: all %d tasks completed correctly, zero duplicate executions' % args.tasks)
-
 
 if __name__ == '__main__':
     main()
