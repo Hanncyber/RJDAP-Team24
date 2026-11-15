@@ -1,9 +1,8 @@
 import hashlib
 import struct
 
-
 WORKER_JOIN = 0
-JOIN_ACK = 1        # server tells the worker its Worker_ID الاضافه
+JOIN_ACK = 1        # we added this to know Worker id
 HEARTBEAT = 2
 TASK_DISPATCH = 3
 TASK_RESULT = 4
@@ -18,6 +17,7 @@ MSG_NAMES = {
     ACK_RESULT: 'ACK_RESULT',
 }
 
+FLAG_NO_MORE_TASKS = 0x01
 
 TASK_FMT = '!QQ32s'    
 RESULT_FMT = '!BQ'     
@@ -28,7 +28,7 @@ def pack_task(start, end, target_digest):
 
 
 def unpack_task(payload):
-    #Return (start, end, target_digest).
+    """Return (start, end, target_digest)."""
     return struct.unpack(TASK_FMT, payload)
 
 
@@ -37,10 +37,11 @@ def pack_result(found, value):
 
 
 def unpack_result(payload):
-    #Return (found, value).
+    """Return (found, value)."""
     found, value = struct.unpack(RESULT_FMT, payload)
     return bool(found), value
 
 
 def digest_of(n):
+    """SHA-256 of the 8-byte big-endian encoding of n. The server uses this to build task targets."""
     return hashlib.sha256(n.to_bytes(8, 'big')).digest()
