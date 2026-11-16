@@ -14,7 +14,7 @@
 | Mohamed Kareem Kamal | 24P0047 |
 
 ### Demo Video
-**Video link:** [Paste the video link here]
+**Video link:** https://drive.google.com/file/d/1SuUitVlP0ghvRC18MpxdOu7pvuG7o15W/view?usp=sharing
 
 ---
 
