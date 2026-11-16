@@ -1,4 +1,4 @@
-# RJDAP-FD v1
+# RMSH 
 ## Reliable Job Dispatch & Aggregation Protocol over UDP
 
 **Computer Networks Major Task — Fall 2026**  
@@ -20,7 +20,7 @@
 
 ## 1. Project Overview
 
-RJDAP-FD is a custom application-layer protocol built on UDP for reliable job dispatch and result aggregation.
+RMSH is a custom application-layer protocol built on UDP for reliable job dispatch and result aggregation.
 
 A central **Command Hub (server)** distributes small hash-search tasks to **Worker clients**. Each Worker processes its assigned task and returns the result to the Hub. The protocol uses acknowledgements, retransmissions, and duplicate-result suppression to improve reliability and ensure each result is accepted and counted only once.
 
@@ -191,4 +191,4 @@ In Phase 1, a Worker retransmits its result after a fixed 200 ms acknowledgement
 
 ---
 
-**End of README — RJDAP-FD v1, Phase 1 Prototype**
+**End of README — RMSH, Phase 1 Prototype**
