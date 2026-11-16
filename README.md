@@ -14,9 +14,6 @@
 | Mohamed Kareem Kamal | 24P0047 |
 
 ### Demo Video
-
-**Duration:** 5 minutes  
-**Access:** Anyone with the link can view  
 **Video link:** [Paste the video link here]
 
 ---
@@ -55,7 +52,7 @@ docs/       Project proposal and Mini-RFC
 Run the baseline test from the **project root directory** (the directory containing this README).
 
 ```bash
-python -m tests.baseline
+python tests/baseline.py
 ```
 
 On Linux or macOS, use `python3` if `python` does not point to Python 3.
