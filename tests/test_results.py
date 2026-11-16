@@ -3,7 +3,7 @@ import csv
 import glob
 import os
 from collections import Counter
-
+ 
 def read_csv(path):
     with open(path, newline='') as f:
         return list(csv.DictReader(f))
